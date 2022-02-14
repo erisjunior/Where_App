@@ -215,6 +215,7 @@ class _CreateState extends State<Create> {
                       Call call = Call();
                       call.name = name;
                       call.description = description;
+                      call.category = dropdownValue;
                       call.image = image;
                       call.quantity = quantity;
                       call.userName = user.name;

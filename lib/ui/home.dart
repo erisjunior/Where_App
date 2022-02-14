@@ -5,6 +5,7 @@ import 'package:app/helpers/user.dart';
 import 'package:app/domain/call.dart';
 import 'create.dart';
 import 'call.dart';
+import 'register.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -48,6 +49,23 @@ class _HomeState extends State<Home> {
             Icons.home,
             color: primaryColor,
           ),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(
+                Icons.exit_to_app,
+                color: greyColor,
+              ),
+              onPressed: () {
+                userHelper.deleteAllUser().then((value) => {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Register()),
+                      )
+                    });
+              },
+            )
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

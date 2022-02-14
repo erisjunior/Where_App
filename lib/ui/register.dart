@@ -45,6 +45,7 @@ class _RegisterState extends State<Register> {
           centerTitle: false,
           foregroundColor: primaryColor,
           backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
           elevation: 0,
         ),
         body: SingleChildScrollView(

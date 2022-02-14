@@ -76,8 +76,7 @@ class _CallPageState extends State<CallPage> {
                       style: const TextStyle(fontSize: 16.0)),
                   Padding(
                     padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: Text(
-                        'Categoria: ' + (widget.call?.description ?? ""),
+                    child: Text('Categoria: ' + (widget.call?.category ?? ""),
                         style:
                             const TextStyle(fontSize: 16.0, color: greyColor)),
                   ),
