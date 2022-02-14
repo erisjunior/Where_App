@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'call.dart';
-import 'create.dart';
 import 'package:app/common/colors.dart';
 import 'package:app/helpers/call.dart';
+import 'package:app/helpers/user.dart';
 import 'package:app/domain/call.dart';
+import 'create.dart';
+import 'call.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -14,6 +15,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String titleText = "Where";
   CallHelper helper = CallHelper();
+  UserHelper userHelper = UserHelper();
   List<dynamic> calls = [];
 
   @override
@@ -23,9 +25,11 @@ class _HomeState extends State<Home> {
   }
 
   void updateCalls() {
-    helper.getAllCalls().then((callsMap) {
-      setState(() {
-        calls = callsMap;
+    userHelper.getSingleUser().then((user) {
+      helper.getAllCalls(user).then((callsMap) {
+        setState(() {
+          calls = callsMap;
+        });
       });
     });
   }
@@ -50,7 +54,7 @@ class _HomeState extends State<Home> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const Create()),
-            );
+            ).then((_) => {updateCalls()});
           },
           backgroundColor: primaryColor,
           child: const Icon(Icons.add),
@@ -83,12 +87,13 @@ class _HomeState extends State<Home> {
                               ),
                             ),
                             title: Text(calls[index]['name']),
-                            subtitle: const Text('Categoria do produto'),
+                            subtitle: Text(calls[index]['category']),
                             onTap: () {
+                              Call call = Call.fromMap(calls[index]);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const CallPage()),
+                                    builder: (context) => CallPage(call: call)),
                               );
                             },
                           );

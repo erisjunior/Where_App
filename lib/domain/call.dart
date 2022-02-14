@@ -4,10 +4,11 @@ class Call {
   static const String descriptionColumn = "description";
   static const String categoryColumn = "category";
   static const String imageColumn = "image";
-  static const String userNameColumn = "userName";
-  static const String userCityColumn = "userCity";
-  static const String userStateColumn = "userState";
+  static const String userNameColumn = "user_name";
+  static const String userCityColumn = "user_city";
+  static const String userStateColumn = "user_state";
   static const String quantityColumn = "quantity";
+  static const String answersColumn = "answers";
 
   int id = 0;
   String name = '';
@@ -18,6 +19,7 @@ class Call {
   String userCity = '';
   String userState = '';
   String quantity = '';
+  List<dynamic> answers = [];
 
   Call();
 
@@ -35,6 +37,7 @@ class Call {
     userCity = map[userCityColumn];
     userState = map[userStateColumn];
     quantity = map[quantityColumn];
+    answers = map[answersColumn];
   }
 
   Map<String, Object?> toMap() {
@@ -48,6 +51,7 @@ class Call {
       userCityColumn: userCity,
       userStateColumn: userState,
       quantityColumn: quantity,
+      answersColumn: answers,
     };
     if (id != 0) map[idColumn] = id;
 

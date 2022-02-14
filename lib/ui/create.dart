@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:app/common/colors.dart';
 import 'package:app/helpers/call.dart';
+import 'package:app/helpers/user.dart';
 import 'package:app/domain/call.dart';
 
 class Create extends StatefulWidget {
@@ -13,11 +14,13 @@ class _CreateState extends State<Create> {
   String titleText = "Criar chamado";
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   CallHelper helper = CallHelper();
+  UserHelper userHelper = UserHelper();
 
   String name = '';
   String description = '';
   String image = '';
   String quantity = '';
+  String dropdownValue = 'Esportes';
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +136,7 @@ class _CreateState extends State<Create> {
                         child: TextFormField(
                           cursorColor: primaryColor,
                           decoration: const InputDecoration(
-                              hintText: 'Imagem do Produto',
+                              hintText: 'Url da Imagem do Produto',
                               hintStyle: TextStyle(color: lightGreyColor),
                               labelText: 'Imagem',
                               labelStyle: TextStyle(color: greyColor),
@@ -153,6 +156,40 @@ class _CreateState extends State<Create> {
                             }
                           },
                         )),
+                    DropdownButton<String>(
+                      value: dropdownValue,
+                      icon: const Icon(Icons.arrow_downward),
+                      elevation: 16,
+                      style: const TextStyle(color: greyColor),
+                      isExpanded: true,
+                      underline: Container(
+                        height: 1,
+                        color: greyColor,
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownValue = newValue!;
+                        });
+                      },
+                      items: <String>[
+                        'Esportes',
+                        'Papelaria',
+                        'Saúde',
+                        'Alimentação',
+                        'Cosméticos',
+                        'Brinquedos',
+                        'Petshop',
+                        'Casa',
+                        'Eletrônicos',
+                        'Móveis',
+                        'Outros'
+                      ].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                   ],
                 ),
               ),
@@ -174,12 +211,20 @@ class _CreateState extends State<Create> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                    Call call = Call();
-                    call.name = name;
-                    call.description = description;
-                    call.image = image;
-                    call.quantity = quantity;
-                    helper.createCall(call);
+                    userHelper.getSingleUser().then((user) {
+                      Call call = Call();
+                      call.name = name;
+                      call.description = description;
+                      call.image = image;
+                      call.quantity = quantity;
+                      call.userName = user.name;
+                      call.userCity = user.city;
+                      call.userState = user.state;
+
+                      helper
+                          .createCall(call)
+                          .then((value) => {Navigator.pop(context)});
+                    });
                   }
                 },
                 child: const Text('Concluir'),

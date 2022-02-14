@@ -1,21 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:app/common/colors.dart';
+import 'package:app/domain/call.dart';
 
 class CallPage extends StatefulWidget {
-  const CallPage({Key? key}) : super(key: key);
+  Call? call;
+
+  CallPage({this.call});
+
   @override
   _CallPageState createState() => _CallPageState();
 }
 
 class _CallPageState extends State<CallPage> {
-  String titleText = "Produto";
+  List<dynamic> answers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    updateAnswers();
+  }
+
+  void updateAnswers() {
+    answers = widget.call?.answers ?? [];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text(titleText),
+          title: Text(widget.call?.name ?? ""),
           centerTitle: false,
           foregroundColor: primaryColor,
           backgroundColor: Colors.white,
@@ -49,25 +63,26 @@ class _CallPageState extends State<CallPage> {
                       child: Container(
                         width: 190.0,
                         height: 190.0,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                             shape: BoxShape.circle,
+                            color: greyColor,
                             image: DecorationImage(
-                                fit: BoxFit.fill,
-                                image: AssetImage('images/produto.png'))),
+                                image: NetworkImage(widget.call!.image))),
                       ),
                     ),
                   ),
-                  const Text(
-                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in.',
+                  Text(widget.call!.description,
                       textAlign: TextAlign.justify,
-                      style: TextStyle(fontSize: 16.0)),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: Text('Categorias: Esportes',
-                        style: TextStyle(fontSize: 16.0, color: greyColor)),
+                      style: const TextStyle(fontSize: 16.0)),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                    child: Text(
+                        'Categoria: ' + (widget.call?.description ?? ""),
+                        style:
+                            const TextStyle(fontSize: 16.0, color: greyColor)),
                   ),
-                  const Text('Quantidade: 1x',
-                      style: TextStyle(fontSize: 16.0, color: greyColor)),
+                  Text('Quantidade: ' + (widget.call?.quantity ?? "") + 'x',
+                      style: const TextStyle(fontSize: 16.0, color: greyColor)),
                   const Padding(
                     padding: EdgeInsets.only(top: 30.0, bottom: 10.0),
                     child: Text('Lojas que possuem',
@@ -78,22 +93,21 @@ class _CallPageState extends State<CallPage> {
                     child: ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemCount: 3,
+                        itemCount: answers.length,
                         itemBuilder: (BuildContext context, int index) {
                           return ListTile(
                             leading: Image.asset('images/loja.png',
                                 fit: BoxFit.cover),
                             contentPadding: const EdgeInsets.all(0.0),
-                            title: const Text('Amazonias Stores'),
+                            title: Text(answers[index]['store_name']),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const <Widget>[
-                                Text(
-                                    'Av. Senador Salgadinho Filho, Lagoa Nova, 59999-15',
-                                    style: TextStyle(
+                              children: <Widget>[
+                                Text(answers[index]['store_address'],
+                                    style: const TextStyle(
                                         fontSize: 12.0, color: greyColor)),
-                                Text('(84) 9999-9999',
-                                    style: TextStyle(
+                                Text(answers[index]['store_phone'],
+                                    style: const TextStyle(
                                         fontSize: 12.0, color: greyColor)),
                               ],
                             ),

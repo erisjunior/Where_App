@@ -1,101 +1,112 @@
-// import 'package:app/domain/call.dart';
-// import 'package:path/path.dart';
-// import 'package:sqflite/sqflite.dart';
+import 'package:app/domain/user.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
-// class ContactHelper {
-//   static final ContactHelper _instance = ContactHelper.internal();
+class UserHelper {
+  static final UserHelper _instance = UserHelper.internal();
 
-//   factory ContactHelper() => _instance;
+  factory UserHelper() => _instance;
 
-//   ContactHelper.internal();
+  UserHelper.internal();
 
-//   Database? _db;
+  Database? _db;
 
-//   Future<Database?> get db async {
-//     return _db ?? await initDb();
-//   }
+  Future<Database?> get db async {
+    return _db ?? await initDb();
+  }
 
-//   Future<Database> initDb() async {
-//     String? databasesPath = await getDatabasesPath();
-//     String path = join(databasesPath, "contacts.db");
+  Future<Database> initDb() async {
+    String? databasesPath = await getDatabasesPath();
+    String path = join(databasesPath, "user.db");
 
-//     return await openDatabase(path, version: 1,
-//         onCreate: (Database db, int newerVersion) async {
-//       await db.execute(
-//           "CREATE TABLE ${Contact.contactTable}(${Contact.idColumn} INTEGER PRIMARY KEY, "
-//           "                                 ${Contact.nameColumn} TEXT, "
-//           "                                 ${Contact.emailColumn} TEXT, "
-//           "                                 ${Contact.phoneColumn} TEXT, "
-//           "                                 ${Contact.imgColumn} TEXT) ");
-//     });
-//   }
+    return await openDatabase(path, version: 1,
+        onCreate: (Database db, int newerVersion) async {
+      await db.execute(
+          "CREATE TABLE ${User.userTable}(${User.idColumn} INTEGER PRIMARY KEY, "
+          "                                 ${User.nameColumn} TEXT, "
+          "                                 ${User.cityColumn} TEXT, "
+          "                                 ${User.stateColumn} TEXT) ");
+    });
+  }
 
-//   Future<Contact> saveContact(Contact contact) async {
-//     Database? dbContact = await db;
-//     if (dbContact != null) {
-//       contact.id =
-//           await dbContact.insert(Contact.contactTable, contact.toMap());
-//     }
-//     return contact;
-//   }
+  Future<User> saveUser(User user) async {
+    Database? dbUser = await db;
+    if (dbUser != null) {
+      await deleteAllUser();
+      user.id = await dbUser.insert(User.userTable, user.toMap());
+    }
+    return user;
+  }
 
-//   Future<Contact?> getContact(int id) async {
-//     Database? dbContact = await db;
-//     if (dbContact != null) {
-//       List<Map> maps = await dbContact.query(Contact.contactTable,
-//           columns: [
-//             Contact.idColumn,
-//             Contact.nameColumn,
-//             Contact.emailColumn,
-//             Contact.phoneColumn,
-//             Contact.imgColumn
-//           ],
-//           where: "${Contact.idColumn} = ?",
-//           whereArgs: [id]);
-//       return maps.isNotEmpty ? Contact.fromMap(maps.first) : null;
-//     }
-//     return null;
-//   }
+  Future<User?> getUser(int id) async {
+    Database? dbUser = await db;
+    if (dbUser != null) {
+      List<Map> maps = await dbUser.query(User.userTable,
+          columns: [
+            User.idColumn,
+            User.nameColumn,
+            User.cityColumn,
+            User.stateColumn,
+          ],
+          where: "${User.idColumn} = ?",
+          whereArgs: [id]);
+      return maps.isNotEmpty ? User.fromMap(maps.first) : null;
+    }
+    return null;
+  }
 
-//   Future<int> deleteContact(int id) async {
-//     Database? dbContact = await db;
-//     if (dbContact == null) return 0;
-//     return await dbContact.delete(Contact.contactTable,
-//         where: "${Contact.idColumn} = ?", whereArgs: [id]);
-//   }
+  Future<int> deleteUser(int id) async {
+    Database? dbUser = await db;
+    if (dbUser == null) return 0;
+    return await dbUser
+        .delete(User.userTable, where: "${User.idColumn} = ?", whereArgs: [id]);
+  }
 
-//   Future<int> updateContact(Contact c) async {
-//     Database? dbContact = await db;
-//     if (dbContact != null) {
-//       return await dbContact.update(Contact.contactTable, c.toMap(),
-//           where: "${Contact.idColumn} = ?", whereArgs: [c.id]);
-//     } else {
-//       return 0;
-//     }
-//   }
+  Future<int> deleteAllUser() async {
+    Database? dbUser = await db;
+    if (dbUser == null) return 0;
+    return await dbUser.delete(User.userTable);
+  }
 
-//   Future<List> getAllContact() async {
-//     Database? dbContact = await db;
-//     if (dbContact != null) {
-//       List listMap = await dbContact.query(Contact.contactTable);
-//       List<Contact> listContacts = [];
+  Future<int> updateUser(User c) async {
+    Database? dbUser = await db;
+    if (dbUser != null) {
+      return await dbUser.update(User.userTable, c.toMap(),
+          where: "${User.idColumn} = ?", whereArgs: [c.id]);
+    } else {
+      return 0;
+    }
+  }
 
-//       for (Map m in listMap) {
-//         listContacts.add(Contact.fromMap(m));
-//       }
-//       return listContacts;
-//     } else {
-//       return [];
-//     }
-//   }
+  Future<List> getAllUser() async {
+    Database? dbUser = await db;
+    if (dbUser != null) {
+      List listMap = await dbUser.query(User.userTable);
+      List<User> listUsers = [];
 
-//   Future<int?> getNumber() async {
-//     Database? dbContact = await db;
-//     if (dbContact != null) {
-//       return Sqflite.firstIntValue(await dbContact
-//           .rawQuery("SELECT COUNT(*) FROM ${Contact.contactTable}"));
-//     } else {
-//       return 0;
-//     }
-//   }
-// }
+      for (Map m in listMap) {
+        listUsers.add(User.fromMap(m));
+      }
+      return listUsers;
+    } else {
+      return [];
+    }
+  }
+
+  Future<User> getSingleUser() async {
+    Database? dbUser = await db;
+    if (dbUser != null) {
+      List listMap = await dbUser.query(User.userTable);
+      List<User> listUsers = [];
+
+      for (Map m in listMap) {
+        listUsers.add(User.fromMap(m));
+      }
+      if (listUsers.isNotEmpty) {
+        return listUsers.first;
+      }
+    }
+    User user = User();
+    return user;
+  }
+}

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:app/ui/home.dart';
 import 'package:app/common/colors.dart';
-import 'package:app/components/input.dart';
+import 'package:app/helpers/user.dart';
+import 'package:app/domain/user.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -11,6 +13,28 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  UserHelper helper = UserHelper();
+
+  @override
+  void initState() {
+    super.initState();
+    checkUser();
+  }
+
+  void checkUser() {
+    helper.getSingleUser().then((user) {
+      if (user.name != '' && user.city != '' && user.state != '') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Home()),
+        );
+      }
+    });
+  }
+
+  String name = '';
+  String city = '';
+  String state = '';
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +84,85 @@ class _RegisterState extends State<Register> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    buildInput('Nome', 'Seu nome'),
-                    buildInput('Cidade', 'Sua cidade'),
-                    buildInput('Estado', 'Seu estado'),
+                    Padding(
+                        padding: const EdgeInsets.only(bottom: 30.0),
+                        child: TextFormField(
+                          cursorColor: primaryColor,
+                          decoration: const InputDecoration(
+                              hintText: 'Seu Nome',
+                              hintStyle: TextStyle(color: lightGreyColor),
+                              labelText: 'Nome',
+                              labelStyle: TextStyle(color: greyColor),
+                              alignLabelWithHint: true,
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: primaryColor),
+                              )),
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Preencha este campo';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            if (value != null) {
+                              name = value;
+                            }
+                          },
+                        )),
+                    Padding(
+                        padding: const EdgeInsets.only(bottom: 30.0),
+                        child: TextFormField(
+                          cursorColor: primaryColor,
+                          decoration: const InputDecoration(
+                              hintText: 'Sua cidade',
+                              hintStyle: TextStyle(color: lightGreyColor),
+                              labelText: 'Cidade',
+                              labelStyle: TextStyle(color: greyColor),
+                              alignLabelWithHint: true,
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: primaryColor),
+                              )),
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Preencha este campo';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            if (value != null) {
+                              city = value;
+                            }
+                          },
+                        )),
+                    Padding(
+                        padding: const EdgeInsets.only(bottom: 30.0),
+                        child: TextFormField(
+                          cursorColor: primaryColor,
+                          textCapitalization: TextCapitalization.characters,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(2),
+                          ],
+                          decoration: const InputDecoration(
+                              hintText: 'Sigla do estado',
+                              hintStyle: TextStyle(color: lightGreyColor),
+                              labelText: 'Estado',
+                              labelStyle: TextStyle(color: greyColor),
+                              alignLabelWithHint: true,
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: primaryColor),
+                              )),
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Preencha este campo';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            if (value != null) {
+                              state = value;
+                            }
+                          },
+                        )),
                   ],
                 ),
               ),
@@ -82,10 +182,18 @@ class _RegisterState extends State<Register> {
                       ))),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Home()),
-                      );
+                      _formKey.currentState!.save();
+                      User user = User();
+                      user.name = name;
+                      user.city = city;
+                      user.state = state;
+                      helper.saveUser(user).then((value) => {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Home()),
+                            )
+                          });
                     }
                   },
                   child: const Text('Concluir'),
